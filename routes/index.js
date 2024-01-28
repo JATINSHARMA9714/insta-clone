@@ -46,8 +46,9 @@ router.get('/profile', isLoggedIn, async function(req, res) {
   res.render('profile', {footer: true, user});
 });
 
-router.get('/search', isLoggedIn, function(req, res) {
-  res.render('search', {footer: true});
+router.get('/search', isLoggedIn,async function(req, res) {
+  let user  =  await userModel.findOne({username:req.session.passport.user});
+  res.render('search', {footer: true , user});
 });
 
 router.get('/edit', isLoggedIn, async function(req, res) {
@@ -115,6 +116,27 @@ router.get("/logout", function(req, res){
     if (err) { return next(err); }
     res.redirect('/');
   });
+})
+
+
+router.get("/search/:username",async function(req,res){
+  let regex = new RegExp(`^${req.params.username}`,'i');
+  let users = await userModel.find(userModel.find({ username: regex}))
+  res.json(users);
+})
+
+router.get("/post/like/:idName",isLoggedIn,async function(req,res){
+  const post = await postModel.findOne({_id: req.params.idName});
+  const user = await userModel.findOne({username: req.session.passport.user});
+  if(post.like.indexOf(user._id)){
+    post.like.push(user._id);
+
+  }
+  else{
+    post.like.splice(post.like.indexOf(user._id),1);
+  }
+  await post.save();
+  res.redirect("/feed");
 })
 
 function isLoggedIn(req, res, next){

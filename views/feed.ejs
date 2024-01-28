@@ -82,11 +82,17 @@
             <h6 class="text-xs opacity-30"><%= dater(new Date(post.date)) %></h6>
           </div>
           <div class="w-full h-96 mt-4 bg-sky-100 overflow-hidden">
-            <img data-postid="<%= post.id %>" class="postimg w-full h-full object-cover" src="/images/uploads/<%= post.picture %>" alt="">
+            <img data-postid="<%= post.id %>" class="postimg w-full h-full object-cover object-top" src="/images/uploads/<%= post.picture %>" alt="">
           </div>
           <div class="options w-full px-4 flex justify-between items-center text-[1.4rem]">
             <div class="flex gap-3 mt-2">
-              <i class="heart ri-heart-3-line"></i>
+              <a href="/post/like/<%= post._id %>">
+                <% if(post.like.indexOf(user._id)==-1){ %>
+                <i class="heart ri-heart-3-line"></i>
+                <% }else{ %>
+                  <i class="ri-heart-fill text-red-600"></i>
+                <% } %>  
+              </a>
               <i class="ri-chat-3-line"></i>
               <i class="ri-share-circle-line"></i>
             </div>
@@ -161,6 +167,15 @@
         //   console.log(response);
         // })
       }
+
     })
+    document.addEventListener("DOMContentLoaded", function(event) { 
+            var scrollpos = localStorage.getItem('scrollpos');
+            if (scrollpos) window.scrollTo(0, scrollpos);
+        });
+
+        window.onbeforeunload = function(e) {
+            localStorage.setItem('scrollpos', window.scrollY);
+        };
   </script>
   <% include ./partials/footer.ejs %>
